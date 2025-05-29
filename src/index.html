@@ -3,13 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sleep Outside | Home</title>
+    <title>Sleep Outside|Home</title>
     <link rel="stylesheet" href="/css/style.css" />
-    <meta
-      name="description"
-      content="WDD330 - Web Backend Development | Sleep Outside | Home Page"
-    />
-
+    <script src="/js/main.js" type="module"></script>
   </head>
 
   <body>
@@ -18,7 +14,7 @@
       <div class="hero">
         <img
           src="/images/banner-sm.jpg"
-          srcset="/images/banner-sm.jpg 500w, /images/banner.jpg"
+          srcset="images/banner-sm.jpg 500w, images/banner.jpg"
           alt="image of a high mountain lake"
         />
         <div class="logo logo--square">
@@ -32,42 +28,45 @@
           </p>
         </div>
       </div>
-
-      <section class="categories">
-        <h2>Categories</h2>
-        <div class="category-links">
-          <a href="product_listing/?category=tents">
-            <img
-              src="public/images/category/category-tents.svg"
-              alt="category tents icon"
-            />
-            Tents
-          </a>
-          <a href="product_listing/?category=backpacks">
-            <img
-              src="public/images/category/category-backpacks.svg"
-              alt="category backpacks icon"
-            />
-            Backpacks
-          </a>
-          <a href="product_listing/?category=sleeping-bags">
-            <img
-              src="public/images/category/category-sleepingbags.svg"
-              alt="category sleepingbags icon"
-            />
-            Sleeping bags
-          </a>
-          <a href="product_listing/?category=hammocks">
-            <img
-              src="public/images/category/category-hammocks.svg"
-              alt="category hammocks icon"
-            />
-            Hammocks
-          </a>
-        </div>
+      <form id="search-form" class="search-form" role="search">
+        <input
+          type="text"
+          id="search-input"
+          name="query"
+          placeholder="Search products..."
+          required
+        />
+        <button type="submit">Search</button>
+      </form>
+      <section class="products">
+        <ul class="product-grid">
+          <li>
+            <a href="product_listing/index.html?category=tents">
+              <img src="images/category-tents.svg" alt="Tents" />
+              <h2>Tents</h2>
+            </a>
+          </li>
+          <li>
+            <a href="product_listing/index.html?category=backpacks">
+              <img src="images/category-backpacks.svg" alt="Backpacks" />
+              <h2>Backpacks</h2>
+            </a>
+          </li>
+          <li>
+            <a href="product_listing/index.html?category=sleeping-bags">
+              <img src="images/category-sleepingbags.svg" alt="Sleeping Bags" />
+              <h2>Sleeping Bags</h2>
+            </a>
+          </li>
+          <li>
+            <a href="product_listing/index.html?category=hammocks">
+              <img src="images/category-hammocks.svg" alt="Hammocks" />
+              <h2>Hammocks</h2>
+            </a>
+          </li>
+        </ul>
       </section>
     </main>
     <footer id="main-footer"></footer>
-    <script src="js/main.js" type="module"></script>
   </body>
 </html>

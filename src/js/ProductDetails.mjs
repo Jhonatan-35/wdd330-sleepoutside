@@ -1,7 +1,8 @@
-import { getLocalStorage, setLocalStorage } from "./utils.mjs";
+import { addItemToCart } from "./utils.mjs";
+import BreadcrumbItem from "./components/BreadcrumbItem";
+import BreadcrumbList from "./components/BreadcrumbList";
 
 export default class ProductDetails {
-
   constructor(productId, dataSource) {
     this.productId = productId;
     this.product = {};
@@ -9,20 +10,29 @@ export default class ProductDetails {
   }
 
   async init() {
-
     this.product = await this.dataSource.findProductById(this.productId);
- 
     this.renderProductDetails();
-    
     document
       .getElementById("add-to-cart")
-      .addEventListener("click", this.addProductToCart.bind(this));
+      .addEventListener("click", this.addToCart.bind(this));
+
+    const breadcrumbItems = [
+      [this.product.Category, `/product_listing/?category=${this.product.Category}`],
+      [this.product.Name, null, true]
+    ];
+    const breadcrumbList = new BreadcrumbList();
+    breadcrumbItems.forEach(itemData => {
+      const breadcrumItem = new BreadcrumbItem(itemData[0], itemData[1], itemData[2] ?? false);
+      breadcrumbList.addItem(breadcrumItem);
+    });
+    breadcrumbList.renderItems();
   }
 
-  addProductToCart() {
-    const cartItems = getLocalStorage("so-cart") || [];
-    cartItems.push(this.product);
-    setLocalStorage("so-cart", cartItems);
+  addToCart(e) {
+    const productId = e.target.dataset.id;
+    this.dataSource.findProductById(productId).then((product) => {
+      addItemToCart(product);
+    });
   }
 
   renderProductDetails() {
@@ -38,14 +48,21 @@ function productDetailsTemplate(product) {
   const productImage = document.querySelector("#p-image");
   productImage.src = product.Images.PrimaryExtraLarge;
   productImage.alt = product.NameWithoutBrand;
-  const euroPrice = new Intl.NumberFormat('de-DE',
-    {
-      style: 'currency', currency: 'EUR',
-    }).format(Number(product.FinalPrice) * 0.85);
-  document.querySelector("#p-price").textContent = `${euroPrice}`;
-  document.querySelector("#p-color").textContent = product.Colors[0].ColorName;
-  document.querySelector("#p-description").innerHTML = product.DescriptionHtmlSimple;
 
-  document.querySelector("#add-to-cart").dataset.id = product.Id;
+  const productSuggestedRetailPrice = product.SuggestedRetailPrice;
+  const productPrice = product.FinalPrice;
+  const productDiscount = 1 - (productPrice / productSuggestedRetailPrice);
+
+  let productPriceText = `$${productPrice.toFixed(2)}`;
+
+  if (productDiscount > 0) {
+    document.getElementById("productSRP").textContent = `SRP: $${productSuggestedRetailPrice.toFixed(2)}`;
+    productPriceText += `<span class="product-card__discount">-${Math.round(productDiscount * 100)}% off</span>`;
+  }
+
+  document.getElementById("p-price").innerHTML = productPriceText;
+  document.getElementById("p-color").textContent = product.Colors[0].ColorName;
+  document.getElementById("p-description").innerHTML = product.DescriptionHtmlSimple;
+
+  document.getElementById("add-to-cart").dataset.id = product.Id;
 }
-
