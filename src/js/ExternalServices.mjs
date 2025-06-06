@@ -1,16 +1,18 @@
 const baseURL = import.meta.env.VITE_SERVER_URL;
+// const baseURL = "http://server-nodejs.cit.byui.edu:3000/";
 
-function convertToJson(res) {
+async function convertToJson(res) {
+  const data = await res.json();
   if (res.ok) {
-    return res.json();
+    return data;
   } else {
-    throw new Error("Bad Response");
+    throw { name: "servicesError", message: data };
   }
 }
 
 export default class ExternalServices {
   constructor() {
-  
+   
   }
   async getData(category) {
     const response = await fetch(`${baseURL}products/search/${category}`);
@@ -23,14 +25,34 @@ export default class ExternalServices {
     const data = await convertToJson(response);
     return data.Result;
   }
-    async checkout(payload) {
-    const options = {
+
+  async checkout(payload) {
+
+    let url = "http://wdd330-backend.onrender.com/checkout";
+    let h = new Headers();
+    h.append("Content-Type", "application/json");
+
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: h,
       body: JSON.stringify(payload),
-    };
-    return await fetch(`${baseURL}checkout/`, options).then(convertToJson);
+    });
+
+    const data = await convertToJson(response);
+    return data.Result;
+
   }
+
+  async getAllProducts() {
+    const categories = ["tents", "backpacks", "sleeping-bags", "hammocks"];
+    const allProducts = [];
+
+    for (let cat of categories) {
+      const response = await fetch(`${baseURL}products/search/${cat}`);
+      const data = await response.json(); 
+      allProducts.push(...data.Result);
+    }
+
+    return allProducts;
+    }
 }

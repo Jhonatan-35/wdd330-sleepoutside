@@ -29,7 +29,7 @@ export function getParam(param) {
   return product;
 }
 
-
+// Return all the query parameters at once - SearchBox
 export function getParams() {
   const queryString = window.location.search;
   return Object.fromEntries(new URLSearchParams(queryString));
@@ -51,7 +51,14 @@ export function updateCartCount() {
   }
 }
 
-// updates the cart badge right away
+export function updateCartQtyInLocalStorage(id, qty) {
+  let cartItems = getLocalStorage("so-cart") || [];
+  const itemIndex = cartItems.findIndex(item => item.Id == id);
+  cartItems[itemIndex].quantity = qty;
+  setLocalStorage("so-cart", cartItems);
+}
+
+
 export function addItemToCart(product) {
   const cart = getLocalStorage("so-cart") || [];
   let existingItem = cart.find(item => item.Id === product.Id);
@@ -70,7 +77,7 @@ export function addItemToCart(product) {
 }
 
 export function renderWithTemplate(template, parentElement, data, callback) {
-  parentElement.innerHTML = template;
+  parentElement.innerHTML = template; 
   if (callback) {
     callback(data);
   }
@@ -112,4 +119,45 @@ function interpolate(template, data) {
 
 export function renderWithTemplate2(template, parentElement, dataList) {
   parentElement.innerHTML = dataList.map(item => interpolate(template, item)).join("");
+}
+
+export function alertMessage(message, scroll = true, duration = 3000) {
+  const alert = document.createElement("div");
+  alert.classList.add("alert");
+  alert.innerHTML = `<p>${message}</p><span>X</span>`;
+
+  alert.addEventListener("click", function (e) {
+    if (e.target.tagName == "SPAN") {
+      main.removeChild(this);
+    }
+  });
+  const main = document.querySelector("main");
+  main.prepend(alert);
+  if (scroll) window.scrollTo(0, 0);
+
+}
+
+export function removeAllAlerts() {
+  const alerts = document.querySelectorAll(".alert");
+  alerts.forEach((alert) => document.querySelector("main").removeChild(alert));
+}
+
+export function getProductComments(productId) {
+  const allComments = getLocalStorage("product-comments") || {};
+  return allComments[productId] || [];
+}
+
+export function saveProductComment(productId, commentObj) {
+  const allComments = getLocalStorage("product-comments") || {};
+  if (!allComments[productId]) {
+    allComments[productId] = [];
+  }
+  allComments[productId].push(commentObj);
+  setLocalStorage("product-comments", allComments);
+}
+
+
+export function getDiscountPercent(finalPrice, originalPrice) {
+  const discount = 1 - (finalPrice / originalPrice);
+  return Math.round(discount * 100);
 }
